@@ -15,10 +15,20 @@ class Upkeep < Formula
   depends_on :macos
 
   def install
-    # Create virtual environment and install Python package
-    # This automatically creates the 'upkeep' command from the entry point
+    # Create virtual environment
     venv = virtualenv_create(libexec, "python3.12")
-    venv.pip_install_and_link buildpath
+    
+    # Install the package with all dependencies
+    system libexec/"bin/pip", "install", "--no-deps", "."
+    system libexec/"bin/pip", "install", 
+           "rich>=13.7.0",
+           "click>=8.1.7", 
+           "psutil>=5.9.0",
+           "fastapi>=0.109.0",
+           "uvicorn[standard]>=0.27.0"
+    
+    # Link the executable
+    bin.install_symlink libexec/"bin/upkeep"
     
     # Install the main bash script
     libexec.install "upkeep.sh"
