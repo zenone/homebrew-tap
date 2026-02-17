@@ -2,8 +2,6 @@
 # frozen_string_literal: true
 
 class Upkeep < Formula
-  include Language::Python::Virtualenv
-
   desc "Modern, safe-by-default maintenance toolkit for macOS"
   homepage "https://github.com/zenone/upkeep"
   url "https://github.com/zenone/upkeep/archive/refs/tags/v3.2.1.tar.gz"
@@ -15,11 +13,18 @@ class Upkeep < Formula
   depends_on :macos
 
   def install
-    # Create virtual environment
-    venv = virtualenv_create(libexec, "python3.12")
+    # Use Homebrew's python to create venv and install
+    python = Formula["python@3.12"].opt_bin/"python3.12"
     
-    # Install the package with all dependencies via pip
-    system libexec/"bin/pip", "install", "."
+    # Create virtual environment with pip
+    system python, "-m", "venv", libexec
+    
+    # Ensure pip is available and up to date
+    system libexec/"bin/python", "-m", "ensurepip", "--upgrade"
+    
+    # Install the package
+    system libexec/"bin/pip", "install", "--upgrade", "pip"
+    system libexec/"bin/pip", "install", buildpath
     
     # Link the executable
     bin.install_symlink libexec/"bin/upkeep"
