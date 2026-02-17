@@ -1,46 +1,76 @@
 # Homebrew Tap for Upkeep
 
-This is a [Homebrew](https://brew.sh/) tap for [Upkeep](https://github.com/zenone/upkeep) - a modern, safe-by-default maintenance toolkit for macOS.
+This is a [Homebrew](https://brew.sh/) tap for [Upkeep](https://github.com/zenone/upkeep) — a modern, safe-by-default maintenance toolkit for macOS.
 
 ## Installation
-
-```bash
-# Add the tap
-brew tap zenone/tap https://github.com/zenone/homebrew-tap
-
-# Install upkeep
-brew install upkeep
-```
-
-Or in one line:
 
 ```bash
 brew install zenone/tap/upkeep
 ```
 
-## Usage
+That's it! One command installs everything.
 
-After installation, you have three commands available:
+## Available Commands
+
+| Command | What It Does |
+|---------|--------------|
+| `upkeep-web` | Launch the web dashboard at http://localhost:8080 |
+| `upkeep` | Python CLI with rich terminal output |
+| `upkeep-sh` | Direct bash script (works without Python) |
+
+## Quick Start
 
 ```bash
-# Launch the web dashboard
+# Launch the web UI (recommended)
 upkeep-web
 
-# Quick system health check (bash script)
+# Quick health check in terminal
 upkeep-sh --status
 
 # Run safe maintenance operations
 upkeep-sh --all-safe
 
-# Python CLI for system info
-upkeep --help
+# See all options
+upkeep-sh --help
+```
+
+## Web Dashboard
+
+```bash
+upkeep-web
+```
+
+- Opens automatically at **http://localhost:8080**
+- Runs in foreground — press `Ctrl+C` to stop
+- Use a different port: `upkeep-web --port 9000`
+
+## Scheduled Maintenance (Optional)
+
+Want automatic scheduled maintenance? Install the background daemon:
+
+```bash
+sudo "$(brew --prefix upkeep)/libexec/install-daemon.sh"
+```
+
+Then configure schedules via the web UI's **Schedule** tab.
+
+**Daemon management:**
+```bash
+# Check status
+sudo launchctl list | grep upkeep
+
+# View logs
+tail -f /var/log/upkeep-daemon.log
+
+# Stop/start
+sudo launchctl unload /Library/LaunchDaemons/com.upkeep.daemon.plist
+sudo launchctl load /Library/LaunchDaemons/com.upkeep.daemon.plist
 ```
 
 ## Updating
 
 ```bash
-brew update
-brew upgrade upkeep
+brew update && brew upgrade upkeep
 ```
 
 ## Uninstalling
@@ -52,14 +82,15 @@ brew untap zenone/tap
 
 ## About Upkeep
 
-Upkeep is your Mac's personal health coach - a comprehensive maintenance toolkit that takes a measured, informed approach to system optimization. Unlike "cleaner" apps that use scare tactics, Upkeep shows you actual data and lets you make informed decisions.
+Your Mac's personal health coach — a comprehensive maintenance toolkit that takes a measured, informed approach. Unlike "cleaner" apps that use scare tactics, Upkeep shows you actual data and lets you make informed decisions.
 
 **Features:**
-- 🩺 Quick Health Check - Comprehensive system scan
-- 📊 44 maintenance operations (updates, cleanup, reports)
+- 🌐 Web dashboard with 7 tabs (Dashboard, Storage, Maintenance, Uninstaller, Disk Viz, Duplicates, Schedule)
+- 🩺 Health score with actionable insights
+- 📊 44 maintenance operations organized by category
 - 📅 Scheduled maintenance via macOS launchd
-- 🗑️ App Uninstaller with associated data cleanup
+- 🗑️ App uninstaller with full associated data cleanup
 - 📁 Disk visualization and duplicate finder
 - 🌙 Dark mode support
 
-For more information, visit the [Upkeep repository](https://github.com/zenone/upkeep).
+For full documentation, visit the [Upkeep repository](https://github.com/zenone/upkeep).
