@@ -4,8 +4,8 @@
 class Upkeep < Formula
   desc "Modern, safe-by-default maintenance toolkit for macOS"
   homepage "https://github.com/zenone/upkeep"
-  url "https://github.com/zenone/upkeep/archive/refs/tags/v3.2.6.tar.gz"
-  sha256 "c610b9d95d27db7fbaf4db4cd3c23a4f0932d621eaf325c479b694b2a5544494"
+  url "https://github.com/zenone/upkeep/archive/refs/tags/v3.2.7.tar.gz"
+  sha256 "9b1410e8237fb9e643e985750f80738952db23f404281e00de1c983fda214b7b"
   license "MIT"
   head "https://github.com/zenone/upkeep.git", branch: "main"
 
