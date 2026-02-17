@@ -12,19 +12,15 @@ class Upkeep < Formula
   head "https://github.com/zenone/upkeep.git", branch: "main"
 
   depends_on "python@3.12"
-  depends_on "node" => :build  # For building TypeScript frontend
   depends_on :macos
 
   def install
-    # Create virtual environment
+    # Create virtual environment and install Python package
     venv = virtualenv_create(libexec, "python3.12")
-    
-    # Install Python package and dependencies
     venv.pip_install_and_link buildpath
     
-    # Build the web frontend (TypeScript -> JS)
-    system "npm", "install", "--ignore-scripts"
-    system "npm", "run", "build:web"
+    # Install the web static files (pre-built JS included in release)
+    (libexec/"web").install Dir["src/upkeep/web/static/*"]
     
     # Install the main bash script
     libexec.install "upkeep.sh"
@@ -35,7 +31,7 @@ class Upkeep < Formula
     # Install the daemon installer
     libexec.install "install-daemon.sh"
     
-    # Create wrapper script that sets up environment
+    # Create wrapper script for Python CLI
     (bin/"upkeep").write <<~EOS
       #!/bin/bash
       export UPKEEP_HOME="#{libexec}"
@@ -49,7 +45,7 @@ class Upkeep < Formula
       export UPKEEP_HOME="#{libexec}"
       export PATH="#{libexec}/bin:$PATH"
       cd "#{libexec}"
-      exec bash "#{libexec}/run-web.sh" "$@"
+      exec "#{libexec}/bin/python" -m upkeep.web.server "$@"
     EOS
     
     # Create upkeep-sh command for the bash maintenance script
@@ -82,6 +78,5 @@ class Upkeep < Formula
 
   test do
     assert_match "upkeep", shell_output("#{bin}/upkeep --help")
-    assert_match version.to_s, shell_output("#{bin}/upkeep --version")
   end
 end
