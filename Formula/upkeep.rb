@@ -16,11 +16,8 @@ class Upkeep < Formula
     # Use Homebrew's python to create venv
     python = Formula["python@3.12"].opt_bin/"python3.12"
 
-    # Create virtual environment
-    system python, "-m", "venv", libexec
-
-    # Ensure pip is available
-    system libexec/"bin/python", "-m", "ensurepip", "--upgrade"
+    # Create virtual environment with pip included
+    system python, "-m", "venv", "--upgrade-deps", libexec
 
     # Install the main bash script
     libexec.install "upkeep.sh"
@@ -31,8 +28,7 @@ class Upkeep < Formula
     # Store source for post_install
     (libexec/"src").install Dir["*"]
 
-    # Create placeholder for upkeep command (will be linked in post_install)
-    # This ensures bin directory exists
+    # Create upkeep-sh command (bash script - no Python deps)
     (bin/"upkeep-sh").write <<~EOS
       #!/bin/bash
       exec bash "#{libexec}/upkeep.sh" "$@"
@@ -41,8 +37,7 @@ class Upkeep < Formula
 
   def post_install
     # Install Python package AFTER relocation phase to avoid pydantic_core warning
-    system libexec/"bin/pip", "install", "--upgrade", "pip"
-    system libexec/"bin/pip", "install", libexec/"src"
+    system libexec/"bin/pip", "install", "--no-cache-dir", libexec/"src"
 
     # Create the main upkeep symlink
     bin.install_symlink libexec/"bin/upkeep"
