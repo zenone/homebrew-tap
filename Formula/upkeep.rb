@@ -18,14 +18,8 @@ class Upkeep < Formula
     # Create virtual environment
     venv = virtualenv_create(libexec, "python3.12")
     
-    # Install the package with all dependencies
-    system libexec/"bin/pip", "install", "--no-deps", "."
-    system libexec/"bin/pip", "install", 
-           "rich>=13.7.0",
-           "click>=8.1.7", 
-           "psutil>=5.9.0",
-           "fastapi>=0.109.0",
-           "uvicorn[standard]>=0.27.0"
+    # Install the package with all dependencies via pip
+    system libexec/"bin/pip", "install", "."
     
     # Link the executable
     bin.install_symlink libexec/"bin/upkeep"
@@ -33,7 +27,7 @@ class Upkeep < Formula
     # Install the main bash script
     libexec.install "upkeep.sh"
     
-    # Install the daemon installer
+    # Install the daemon installer  
     libexec.install "install-daemon.sh"
     
     # Create upkeep-web command for launching web UI
