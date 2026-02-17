@@ -13,21 +13,14 @@ class Upkeep < Formula
   depends_on "python@3.12"
 
   def install
-    # Use Homebrew's python to create venv and install
+    # Use Homebrew's python to create venv
     python = Formula["python@3.12"].opt_bin/"python3.12"
 
-    # Create virtual environment with pip
+    # Create virtual environment
     system python, "-m", "venv", libexec
 
-    # Ensure pip is available and up to date
+    # Ensure pip is available
     system libexec/"bin/python", "-m", "ensurepip", "--upgrade"
-
-    # Install the package
-    system libexec/"bin/pip", "install", "--upgrade", "pip"
-    system libexec/"bin/pip", "install", buildpath
-
-    # Link the executable
-    bin.install_symlink libexec/"bin/upkeep"
 
     # Install the main bash script
     libexec.install "upkeep.sh"
@@ -35,17 +28,31 @@ class Upkeep < Formula
     # Install the daemon installer
     libexec.install "install-daemon.sh"
 
+    # Store source for post_install
+    (libexec/"src").install Dir["*"]
+
+    # Create placeholder for upkeep command (will be linked in post_install)
+    # This ensures bin directory exists
+    (bin/"upkeep-sh").write <<~EOS
+      #!/bin/bash
+      exec bash "#{libexec}/upkeep.sh" "$@"
+    EOS
+  end
+
+  def post_install
+    # Install Python package AFTER relocation phase to avoid pydantic_core warning
+    system libexec/"bin/pip", "install", "--upgrade", "pip"
+    system libexec/"bin/pip", "install", libexec/"src"
+
+    # Create the main upkeep symlink
+    bin.install_symlink libexec/"bin/upkeep"
+
     # Create upkeep-web command for launching web UI
     (bin/"upkeep-web").write <<~EOS
       #!/bin/bash
       exec "#{libexec}/bin/python" -m uvicorn upkeep.web.server:app --host 127.0.0.1 --port 8080 "$@"
     EOS
-
-    # Create upkeep-sh command for the bash maintenance script
-    (bin/"upkeep-sh").write <<~EOS
-      #!/bin/bash
-      exec bash "#{libexec}/upkeep.sh" "$@"
-    EOS
+    (bin/"upkeep-web").chmod 0755
   end
 
   def caveats
