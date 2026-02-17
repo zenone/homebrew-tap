@@ -16,36 +16,20 @@ class Upkeep < Formula
 
   def install
     # Create virtual environment and install Python package
+    # This automatically creates the 'upkeep' command from the entry point
     venv = virtualenv_create(libexec, "python3.12")
     venv.pip_install_and_link buildpath
-    
-    # Install the web static files (pre-built JS included in release)
-    (libexec/"web").install Dir["src/upkeep/web/static/*"]
     
     # Install the main bash script
     libexec.install "upkeep.sh"
     
-    # Install the web runner script
-    libexec.install "run-web.sh"
-    
     # Install the daemon installer
     libexec.install "install-daemon.sh"
-    
-    # Create wrapper script for Python CLI
-    (bin/"upkeep").write <<~EOS
-      #!/bin/bash
-      export UPKEEP_HOME="#{libexec}"
-      export PATH="#{libexec}/bin:$PATH"
-      exec "#{libexec}/bin/upkeep" "$@"
-    EOS
     
     # Create upkeep-web command for launching web UI
     (bin/"upkeep-web").write <<~EOS
       #!/bin/bash
-      export UPKEEP_HOME="#{libexec}"
-      export PATH="#{libexec}/bin:$PATH"
-      cd "#{libexec}"
-      exec "#{libexec}/bin/python" -m upkeep.web.server "$@"
+      exec "#{libexec}/bin/python" -m uvicorn upkeep.web.server:app --host 127.0.0.1 --port 8080 "$@"
     EOS
     
     # Create upkeep-sh command for the bash maintenance script
