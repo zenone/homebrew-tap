@@ -28,26 +28,28 @@ class Upkeep < Formula
     # Store source for post_install
     (libexec/"src").install Dir["*"]
 
-    # Create upkeep-sh command (bash script - no Python deps)
+    # Create upkeep-sh command (bash script - no Python deps, can be linked now)
     (bin/"upkeep-sh").write <<~EOS
       #!/bin/bash
       exec bash "#{libexec}/upkeep.sh" "$@"
+    EOS
+
+    # Create wrapper scripts that will work after post_install runs
+    # These go in bin/ now so Homebrew links them during install
+    (bin/"upkeep").write <<~EOS
+      #!/bin/bash
+      exec "#{libexec}/bin/upkeep" "$@"
+    EOS
+
+    (bin/"upkeep-web").write <<~EOS
+      #!/bin/bash
+      exec "#{libexec}/bin/python" -m uvicorn upkeep.web.server:app --host 127.0.0.1 --port 8080 "$@"
     EOS
   end
 
   def post_install
     # Install Python package AFTER relocation phase to avoid pydantic_core warning
     system libexec/"bin/pip", "install", "--no-cache-dir", libexec/"src"
-
-    # Create the main upkeep symlink
-    bin.install_symlink libexec/"bin/upkeep"
-
-    # Create upkeep-web command for launching web UI
-    (bin/"upkeep-web").write <<~EOS
-      #!/bin/bash
-      exec "#{libexec}/bin/python" -m uvicorn upkeep.web.server:app --host 127.0.0.1 --port 8080 "$@"
-    EOS
-    (bin/"upkeep-web").chmod 0755
   end
 
   def caveats
