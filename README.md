@@ -94,3 +94,11 @@ Your Mac's personal health coach — a comprehensive maintenance toolkit that ta
 - 🌙 Dark mode support
 
 For full documentation, visit the [Upkeep repository](https://github.com/zenone/upkeep).
+
+---
+
+<p align="center">
+  Made by <a href="https://github.com/zenone">@zenone</a>
+  <br>
+  <a href="https://www.linkedin.com/in/zenone/">LinkedIn</a> · <a href="https://github.com/zenone">GitHub</a>
+</p>
