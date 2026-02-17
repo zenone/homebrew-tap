@@ -73,6 +73,11 @@ sudo launchctl load /Library/LaunchDaemons/com.upkeep.daemon.plist
 brew update && brew upgrade upkeep
 ```
 
+**If you use the daemon for scheduled maintenance**, also re-run the installer to update daemon files:
+```bash
+sudo "$(brew --prefix upkeep)/libexec/install-daemon.sh"
+```
+
 ## Uninstalling
 
 ```bash
